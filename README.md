@@ -85,10 +85,13 @@ flowchart LR
 
 ## 验证状态
 
+- 首版 [GitHub 构建与无登录启动验收](https://github.com/okelekaf01-cmd/qq-companion-kit/actions/runs/42623491269) 已通过，使用全新 Linux 数据卷验证 DSH 就绪、管理接口鉴权和默认拒绝聊天。7 项自动测试通过，Windows 脚本语法及教程桌面/手机布局已核对。
 - `npm test` 覆盖配置默认拒绝、白名单校验、初始化重试保留数据和安装向导鉴权。
 - GitHub Actions 会检查脚本、Compose，构建镜像并验证无需 QQ 登录的初次启动。
 - Windows Docker Desktop 全新系统安装、真实 QQ 扫码、手机验证、实际消息收发属于人工验收项。CI 通过也不代表这些步骤已经验证。
 - 页面图表是原理与字段示意，真实软件界面以实际版本为准。
+
+下载包的 SHA-256 见同一 Release 中的 `SHA256SUMS.txt`。Windows 可用 `Get-FileHash .\qq-companion-kit-v0.1.0.zip -Algorithm SHA256` 核对，Linux 可在同一目录运行 `sha256sum -c SHA256SUMS.txt`。
 
 ## 账号、费用与权限
 
