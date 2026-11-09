@@ -5,9 +5,10 @@ RUN node /usr/local/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/
 ARG BRIDGE_REV=a49877f4e58d04e47532d44b803360d0f001160d
 RUN mkdir -p /opt/qq-bridge && curl -fsSL "https://codeload.github.com/Derpyu520/qq-bridge/tar.gz/${BRIDGE_REV}" | tar -xz --strip-components=1 -C /opt/qq-bridge
 WORKDIR /opt/qq-bridge
-RUN npm ci --omit=dev && node scripts/build-agent-preset-patches.mjs
+RUN npm ci --omit=dev
 COPY docker/ /opt/kit/
 COPY docs/ /opt/kit/docs/
+RUN node /opt/kit/prepare-bridge.mjs /opt/qq-bridge && node scripts/build-agent-preset-patches.mjs
 USER node
 ENV HOME=/data DSH_HOME=/data/dsh NODE_OPTIONS=--max-old-space-size=512
 WORKDIR /data

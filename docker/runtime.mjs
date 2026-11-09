@@ -41,7 +41,7 @@ if(!fs.existsSync('/data/.bundles-ready')) {
   checked('bundle-install','dsh',['plugin','--profile','web','install'],600000);
   fs.writeFileSync('/data/.bundles-ready','0.1.0\n');
 }
-let stopping=false,ready=false;
+let stopping=false,ready=false,dshStarted=false;
 const children=[];
 function stop(code=0) {
   if(stopping)return;
@@ -58,11 +58,16 @@ function start(name,command,args,cwd) {
 }
 start('dsh','dsh',['web','--no-open','--port','18680'],'/data/workspace');
 for(let i=0;i<180;i++) {
-  try {const r=await fetch('http://127.0.0.1:18680/',{signal:AbortSignal.timeout(1000)});if([200,401].includes(r.status)&&fs.existsSync('/data/dsh/.credentials.yaml')){ready=true;break;}}catch{}
+  try {const r=await fetch('http://127.0.0.1:18680/',{signal:AbortSignal.timeout(1000)});if([200,401].includes(r.status)&&fs.existsSync('/data/dsh/.credentials.yaml')){dshStarted=true;break;}}catch{}
   await new Promise(resolve=>setTimeout(resolve,1000));
 }
-if(!ready)throw Error('DSH startup timeout');
+if(!dshStarted)throw Error('DSH startup timeout');
 start('bridge','node',['src/bridge.js'],root);
+for(let i=0;i<120;i++) {
+  try {if((await bridgeRequest('/api/status')).dshReady){ready=true;break;}}catch{}
+  await new Promise(resolve=>setTimeout(resolve,1000));
+}
+if(!ready)throw Error('Bridge did not connect to DSH before timeout');
 for(const [listen,target] of [[18080,18680],[13100,18610]]) {
   net.createServer(socket=>{
     const upstream=net.connect(target,'127.0.0.1');socket.pipe(upstream).pipe(socket);
