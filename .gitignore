@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+*.log
+*.pid
+*.bak
+.DS_Store
+state/
+config.json
+.install.lock/
